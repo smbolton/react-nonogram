@@ -46,15 +46,22 @@ function Clue(props) {
 }
 
 function Square(props) {
-  let onClick = (event) => props.onClick(event, props.row, props.col);
+  let body;
+  if (props.guess === 'o') {
+    body = props.puzzle ? 'OOO' : 'o';
+  } else if (props.guess === 'x') {
+    body = props.puzzle ? 'XXX' : 'x';
+  } else {
+    body = props.puzzle ? '*' : '-';
+  }
   return (
     <td>
       <button
         className="square"
-        onClick={onClick}
-        onContextMenu={onClick}
+        onClick={props.onClick}
+        onContextMenu={props.onClick}
       >
-        S{props.row},{props.col}
+        {body}
       </button>
     </td>
   );
@@ -74,8 +81,9 @@ function Puzzle(props) {
         { Array.from(Array(10), (_, col) => (
             <Square
               key={row + ',' + col}
-              col={col} row={row}
-              onClick={props.onSquareClick}
+              puzzle={props.puzzle[toIndex(row, col)]}
+              guess={props.guess[toIndex(row, col)]}
+              onClick={(event) => props.onSquareClick(event, row, col)}
             />
           ))
         }
@@ -137,21 +145,47 @@ class Game extends React.Component {
 
     this.state = {
       autoFill: false,
-      mistakes: 0,
     }
+    Object.assign(this.state, newPuzzle());
   }
 
   onSquareClick = (event, row, col) => {
-    console.log('Square!', event, row, col);
-    console.log(event.nativeEvent.which); // 1, 2 or 3 for left, middle, right click
-    console.log(event.type); // 'click' for left or middle, 'contextmenu' for right click
-    if (event.type === 'contextmenu') {
-      event.preventDefault();
+    console.log('Square!', event.type, row, col);
+    //console.log(event.nativeEvent.which); // 1, 2 or 3 for left, middle, right click
+    //console.log(event.type); // 'click' for left or middle, 'contextmenu' for right click
+    let index = toIndex(row, col);
+    if (!this.state.guess[index]) {
+      let guess = this.state.guess.slice();
+      let mistakes = this.state.mistakes;
+      if (event.type === 'click') {
+        if (this.state.puzzle[index]) {
+          guess[index] = 'o'; // guess okay
+          if (this.state.autoFill) {
+            // check_for_fill(row, col);
+          }
+        } else {
+          guess[index] = 'x'; // mistake
+          mistakes++;
+        }
+      } else { /* contextmenu */
+        event.preventDefault();
+        if (!this.state.puzzle[index]) {
+          guess[index] = 'o';
+        } else {
+          guess[index] = 'x';
+          mistakes++;
+          if (this.state.autoFill) {
+            // check_for_fill(row, col);
+          }
+        }
+      }
+      this.setState({ mistakes, guess });
     }
   }
 
   onNewGameClick = () => {
     console.log('New Game!');
+    this.setState(newPuzzle());
   }
 
   onAutoFillChange = () => {
@@ -163,7 +197,11 @@ class Game extends React.Component {
     return (
       <div>
         <div className="row">
-          <Puzzle onSquareClick={this.onSquareClick} />
+          <Puzzle
+            puzzle={this.state.puzzle}
+            guess={this.state.guess}
+            onSquareClick={this.onSquareClick}
+          />
         </div>
         <div className="row">
           <div className="col">
@@ -185,3 +223,14 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
+
+function toIndex(row, col) {
+  return row * 10 + col;
+}
+
+function newPuzzle() {
+  let mistakes = 0;
+  let puzzle = Array.from(Array(100), () => Math.random(1.0) < 0.5);
+  let guess = Array(100).fill(false);
+  return { mistakes, puzzle, guess };
+};
