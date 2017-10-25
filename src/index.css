@@ -3,3 +3,10 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.col {
+    float: left;
+}
+
+.puzzle-clue { width: 10%; }
+.puzzle-col  { width: 9%; }
