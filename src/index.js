@@ -46,7 +46,18 @@ function Clue(props) {
 }
 
 function Square(props) {
-  return (<td>S{props.row},{props.col}</td>);
+  let onClick = (event) => props.onClick(event, props.row, props.col);
+  return (
+    <td>
+      <button
+        className="square"
+        onClick={onClick}
+        onContextMenu={onClick}
+      >
+        S{props.row},{props.col}
+      </button>
+    </td>
+  );
 }
 
 function Puzzle(props) {
@@ -60,7 +71,14 @@ function Puzzle(props) {
     rows.push(
       <tr key={row + 1}>
         <Clue key={'cr' + row} index={row} />
-        { Array.from(Array(10), (_, col) => (<Square key={row + ',' + col} col={col} row={row} />)) }
+        { Array.from(Array(10), (_, col) => (
+            <Square
+              key={row + ',' + col}
+              col={col} row={row}
+              onClick={props.onSquareClick}
+            />
+          ))
+        }
       </tr>
     );
   }
@@ -121,6 +139,15 @@ class Game extends React.Component {
     }
   }
 
+  onSquareClick = (event, row, col) => {
+    console.log('Square!', event, row, col);
+    console.log(event.nativeEvent.which); // 1, 2 or 3 for left, middle, right click
+    console.log(event.type); // 'click' for left or middle, 'contextmenu' for right click
+    if (event.type === 'contextmenu') {
+      event.preventDefault();
+    }
+  }
+
   onNewGameClick = () => {
     console.log('New Game!');
   }
@@ -134,7 +161,7 @@ class Game extends React.Component {
     return (
       <div>
         <div className="row">
-          <Puzzle />
+          <Puzzle onSquareClick={this.onSquareClick} />
         </div>
         <div className="row">
           <div className="col">
