@@ -101,7 +101,13 @@ function NewGame(props) {
 
 function AutoFill(props) {
   return (
-    <p>AutoFill</p>
+    <label>
+      <input
+        type="checkbox"
+        checked={props.checked}
+        onChange={props.onChange} />
+      Auto-fill spaces
+    </label>
   );
 }
 
@@ -110,13 +116,18 @@ class Game extends React.Component {
     super(props);
 
     this.state = {
-      autofill: false,
+      autoFill: false,
       mistakes: 0,
     }
   }
 
-  onNewGame = () => {
+  onNewGameClick = () => {
     console.log('New Game!');
+  }
+
+  onAutoFillChange = () => {
+    console.log('Auto-fill Change!');
+    this.setState({ autoFill: !this.state.autoFill });
   }
 
   render() {
@@ -130,10 +141,10 @@ class Game extends React.Component {
             <Score mistakes={this.state.mistakes} />
           </div>
           <div className="col">
-            <NewGame onClick={this.onNewGame} />
+            <NewGame onClick={this.onNewGameClick} />
           </div>
           <div className="col">
-            <AutoFill />
+            <AutoFill checked={this.state.autoFill} onChange={this.onAutoFillChange} />
           </div>
         </div>
       </div>
