@@ -16,8 +16,24 @@ body {
 .square {
   border: 1px solid #888;
   background: #fff;
-  height: 40px;
-  width: 40px;
+  height: 46px;
+  width: 46px;
   padding: 0;
-  margin: -1px;
+  /* margin: -1px; */
+}
+
+.coin {
+  stroke: #000;
+  stroke-width: 1px;
+  fill: #00f;
+}
+
+.space {
+  stroke: none;
+  fill: #4c4c4c;
+}
+
+.mistake {
+  stroke: #f00;
+  stroke-width: 2.5px;
 }

@@ -48,11 +48,47 @@ function Clue(props) {
 function Square(props) {
   let body;
   if (props.guess === 'o') {
-    body = props.puzzle ? 'OOO' : 'o';
+    if (props.puzzle) {
+      body = (
+        <svg width="36" height="36">
+          <g>
+            <circle className="coin" cx="18" cy="18" r="14" />
+          </g>
+        </svg>
+      );
+    } else {
+      body = (
+        <svg width="40" height="40">
+          <g>
+            <circle className="space" cx="20" cy="20" r="8" />
+          </g>
+        </svg>
+      );
+    }
   } else if (props.guess === 'x') {
-    body = props.puzzle ? 'XXX' : 'x';
+    if (props.puzzle) {
+      body = (
+        <svg width="40" height="40">
+          <g>
+            <circle className="coin" cx="20" cy="20" r="17" />
+            <path className="mistake" d="m 15 15 l 10 10" />
+            <path className="mistake" d="m 15 25 l 10 -10" />
+          </g>
+        </svg>
+      );
+    } else {
+      body = (
+        <svg width="40" height="40">
+          <g>
+            <circle className="space" cx="20" cy="20" r="8" />
+            <path className="mistake" d="m 15 15 l 10 10" />
+            <path className="mistake" d="m 15 25 l 10 -10" />
+          </g>
+        </svg>
+      );
+    }
   } else {
-    body = props.puzzle ? '*' : '-';
+    body = null; // props.puzzle ? '*' : '-';
   }
   return (
     <td>
