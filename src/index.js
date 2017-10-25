@@ -48,7 +48,7 @@ function Clue(props) {
 function Square(props) {
   let body;
   if (props.guess === 'o') {
-    if (props.puzzle) {
+    if (props.coin) {
       body = (
         <svg width="36" height="36">
           <g>
@@ -66,7 +66,7 @@ function Square(props) {
       );
     }
   } else if (props.guess === 'x') {
-    if (props.puzzle) {
+    if (props.coin) {
       body = (
         <svg width="40" height="40">
           <g>
@@ -88,7 +88,7 @@ function Square(props) {
       );
     }
   } else {
-    body = null; // props.puzzle ? '*' : '-';
+    body = null; // props.coin ? '*' : '-';
   }
   return (
     <td>
@@ -117,8 +117,8 @@ function Puzzle(props) {
         { Array.from(Array(10), (_, col) => (
             <Square
               key={row + ',' + col}
-              puzzle={props.puzzle[toIndex(row, col)]}
-              guess={props.guess[toIndex(row, col)]}
+              coin={props.puzzle[toIndex(row, col)]}
+              guess={props.guesses[toIndex(row, col)]}
               onClick={(event) => props.onSquareClick(event, row, col)}
             />
           ))
@@ -190,32 +190,32 @@ class Game extends React.Component {
     //console.log(event.nativeEvent.which); // 1, 2 or 3 for left, middle, right click
     //console.log(event.type); // 'click' for left or middle, 'contextmenu' for right click
     let index = toIndex(row, col);
-    if (!this.state.guess[index]) {
-      let guess = this.state.guess.slice();
+    if (!this.state.guesses[index]) {
+      let guesses = this.state.guesses.slice();
       let mistakes = this.state.mistakes;
       if (event.type === 'click') {
         if (this.state.puzzle[index]) {
-          guess[index] = 'o'; // guess okay
+          guesses[index] = 'o'; // guess okay
           if (this.state.autoFill) {
             // check_for_fill(row, col);
           }
         } else {
-          guess[index] = 'x'; // mistake
+          guesses[index] = 'x'; // mistake
           mistakes++;
         }
       } else { /* contextmenu */
         event.preventDefault();
         if (!this.state.puzzle[index]) {
-          guess[index] = 'o';
+          guesses[index] = 'o';
         } else {
-          guess[index] = 'x';
+          guesses[index] = 'x';
           mistakes++;
           if (this.state.autoFill) {
             // check_for_fill(row, col);
           }
         }
       }
-      this.setState({ mistakes, guess });
+      this.setState({ mistakes, guesses });
     }
   }
 
@@ -235,7 +235,7 @@ class Game extends React.Component {
         <div className="row">
           <Puzzle
             puzzle={this.state.puzzle}
-            guess={this.state.guess}
+            guesses={this.state.guesses}
             onSquareClick={this.onSquareClick}
           />
         </div>
@@ -267,6 +267,6 @@ function toIndex(row, col) {
 function newPuzzle() {
   let mistakes = 0;
   let puzzle = Array.from(Array(100), () => Math.random(1.0) < 0.5);
-  let guess = Array(100).fill(false);
-  return { mistakes, puzzle, guess };
+  let guesses = Array(100).fill(false);
+  return { mistakes, puzzle, guesses };
 };
