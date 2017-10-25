@@ -85,6 +85,7 @@ function Puzzle(props) {
   return (
     <div className="row">
       <table>
+        {/*
         <colgroup>
           <col className="puzzle-clue" />
           <col className="puzzle-col" />
@@ -97,6 +98,7 @@ function Puzzle(props) {
           <col className="puzzle-col" />
           <col className="puzzle-col" />
         </colgroup>
+        */}
         <tbody>
           {rows}
         </tbody>

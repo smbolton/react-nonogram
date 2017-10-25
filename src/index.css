@@ -8,5 +8,16 @@ body {
     float: left;
 }
 
+/*
 .puzzle-clue { width: 10%; }
 .puzzle-col  { width: 9%; }
+*/
+
+.square {
+  border: 1px solid #888;
+  background: #fff;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  margin: -1px;
+}
