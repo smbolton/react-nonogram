@@ -197,7 +197,7 @@ class Game extends React.Component {
         if (this.state.puzzle[index]) {
           guesses[index] = 'o'; // guess okay
           if (this.state.autoFill) {
-            // check_for_fill(row, col);
+            checkForFill(this.state.puzzle, guesses, row, col);
           }
         } else {
           guesses[index] = 'x'; // mistake
@@ -211,7 +211,7 @@ class Game extends React.Component {
           guesses[index] = 'x';
           mistakes++;
           if (this.state.autoFill) {
-            // check_for_fill(row, col);
+            checkForFill(this.state.puzzle, guesses, row, col);
           }
         }
       }
@@ -270,3 +270,38 @@ function newPuzzle() {
   let guesses = Array(100).fill(false);
   return { mistakes, puzzle, guesses };
 };
+
+function checkForFill(puzzle, guesses, row, col) {
+  let all = true;
+  for (let r = 0; r < 10; r++) {
+    let index = toIndex(r, col);
+    if (puzzle[index] && !guesses[index]) {
+      all = false;
+      break;
+    }
+  }
+  if (all) {
+    for (let r = 0; r < 10; r++) {
+      let index = toIndex(r, col);
+      if (!puzzle[index]) {
+        guesses[index] = guesses[index] || 'o';
+      }
+    }
+  }
+  all = true;
+  for (let c = 0; c < 10; c++) {
+    let index = toIndex(row, c);
+    if (puzzle[index] && !guesses[index]) {
+      all = false;
+      break;
+    }
+  }
+  if (all) {
+    for (let c = 0; c < 10; c++) {
+      let index = toIndex(row, c);
+      if (!puzzle[index]) {
+        guesses[index] = guesses[index] || 'o';
+      }
+    }
+  }
+}
