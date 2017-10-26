@@ -41,6 +41,59 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+function RowClue(props) {
+  // -FIX- this works, but it gives away information!
+  // !FIX! y - 1 => props.row
+  // x0 -> col0
+  // x -> col
+  let row = props.row;
+  let count = [];
+  let known = [];
+  let col0 = 0;
+  let t = props.puzzle[toIndex(row, 0)];
+  let k = props.guesses[toIndex(row, 0)];
+  for (let col = 1; col <= 10; col++) {
+    if (col === 10 || props.puzzle[toIndex(row, col)] !== t) {
+      if (t) {
+        count.push(col - col0);
+        if ((col === 10 || props.guesses[toIndex(row, col)]) && k) {
+          known.push(true);
+        } else {
+          known.push(false);
+        }
+      }
+      t = !t;
+      col0 = col;
+    }
+    if (col < 10) {
+      if (props.puzzle[toIndex(row, col)]) {
+        if (!props.guesses[toIndex(row, col)]) {
+          k = false;
+        }
+      } else {
+        k = props.guesses[toIndex(row, col)];
+      }
+    }
+  }
+  let all = true;
+  for (let col = 1; col <= 10; col++) {
+    if (props.puzzle[toIndex(row, col)] && !props.guesses[toIndex(row, col)]) {
+      all = false;
+    }
+  }
+  let text = [];
+  for (let n = 0; n < count.length; n++) {
+    if (all) {
+      text.push(<span style={{color: '#000'}}> {count[n]}</span>);
+    } else if (known[n]) {
+      text.push(<span style={{color: '#00f'}}> {count[n]}</span>);
+    } else {
+      text.push(<span style={{color: '#f00'}}> {count[n]}</span>);
+    }
+  }
+  return (<td>{text}</td>);
+}
+
 function Clue(props) {
   return (<td>C{props.index}</td>);
 }
@@ -113,7 +166,7 @@ function Puzzle(props) {
   for (let row = 0; row < 10; row++) {
     rows.push(
       <tr key={row + 1}>
-        <Clue key={'cr' + row} index={row} />
+        <RowClue key={'cr' + row} row={row} puzzle={props.puzzle} guesses={props.guesses} />
         { Array.from(Array(10), (_, col) => (
             <Square
               key={row + ',' + col}
