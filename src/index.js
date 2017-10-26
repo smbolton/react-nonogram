@@ -41,101 +41,52 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-function RowClue(props) {
-  // -FIX- this works, but it gives away information!
-  let row = props.row;
+function Clue(props) {
+  let puzzle, guesses, separator;
+  if (props.orientation === 'row') {
+    puzzle = Array.from(Array(10), (_, col) => props.puzzle[toIndex(props.index, col)]);
+    guesses = Array.from(Array(10), (_, col) => props.guesses[toIndex(props.index, col)]);
+    separator = ' ';
+  } else { // column
+    puzzle = Array.from(Array(10), (_, row) => props.puzzle[toIndex(row, props.index)]);
+    guesses = Array.from(Array(10), (_, row) => props.guesses[toIndex(row, props.index)]);
+    separator = <br />;
+  }
+  // Build the clue string by scanning the row or column and identifying runs
+  // of coins. For each run, push the count of coins to `count`. Also, if the
+  // run is part of an unbroken string of guesses from either edge, push true
+  // to `known`, else push false.
   let count = [];
   let known = [];
   let col0 = 0;
-  let t = props.puzzle[toIndex(row, 0)];
-  let k = props.guesses[toIndex(row, 0)];
+  let t = puzzle[0];
   for (let col = 1; col <= 10; col++) {
-    if (col === 10 || props.puzzle[toIndex(row, col)] !== t) {
+    if (col === 10 || puzzle[col] !== t) {
       if (t) {
         count.push(col - col0);
-        if ((col === 10 || props.guesses[toIndex(row, col)]) && k) {
-          known.push(true);
-        } else {
-          known.push(false);
-        }
+        known.push(guesses.slice(0, col).every(p => p) ||
+                   guesses.slice(col0, 10).every(p => p));
       }
       t = !t;
       col0 = col;
     }
-    if (col < 10) {
-      if (props.puzzle[toIndex(row, col)]) {
-        if (!props.guesses[toIndex(row, col)]) {
-          k = false;
-        }
-      } else {
-        k = props.guesses[toIndex(row, col)];
-      }
-    }
   }
+  // Check if every coin in the row or column has been guessed.
   let all = true;
   for (let col = 0; col < 10; col++) {
-    if (props.puzzle[toIndex(row, col)] && !props.guesses[toIndex(row, col)]) {
+    if (puzzle[col] && !guesses[col]) {
       all = false;
     }
   }
+  // Build a array of clues as <span> elements, colored based on `all` and `known`.
   let text = [];
   for (let n = 0; n < count.length; n++) {
     if (all) {
-      text.push(<span style={{color: '#000'}}> {count[n]}</span>);
+      text.push(<span style={{color: '#000'}}>{separator}{count[n]}</span>);
     } else if (known[n]) {
-      text.push(<span style={{color: '#00f'}}> {count[n]}</span>);
+      text.push(<span style={{color: '#00f'}}>{separator}{count[n]}</span>);
     } else {
-      text.push(<span style={{color: '#f00'}}> {count[n]}</span>);
-    }
-  }
-  return (<td>{text}</td>);
-}
-
-function ColClue(props) {
-  // -FIX- this works, but it gives away information!
-  let col = props.col;
-  let count = [];
-  let known = [];
-  let row0 = 0;
-  let t = props.puzzle[toIndex(0, col)];
-  let k = props.guesses[toIndex(0, col)];
-  for (let row = 1; row <= 10; row++) {
-    if (row === 10 || props.puzzle[toIndex(row, col)] !== t) {
-      if (t) {
-        count.push(row - row0);
-        if ((row === 10 || props.guesses[toIndex(row, col)]) && k) {
-          known.push(true);
-        } else {
-          known.push(false);
-        }
-      }
-      t = !t;
-      row0 = row;
-    }
-    if (row < 10) {
-      if (props.puzzle[toIndex(row, col)]) {
-        if (!props.guesses[toIndex(row, col)]) {
-          k = false;
-        }
-      } else {
-        k = props.guesses[toIndex(row, col)];
-      }
-    }
-  }
-  let all = true;
-  for (let row = 0; row < 10; row++) {
-    if (props.puzzle[toIndex(row, col)] && !props.guesses[toIndex(row, col)]) {
-      all = false;
-    }
-  }
-  let text = [];
-  for (let n = 0; n < count.length; n++) {
-    if (all) {
-      text.push(<span style={{color: '#000'}}><br />{count[n]}</span>);
-    } else if (known[n]) {
-      text.push(<span style={{color: '#00f'}}><br />{count[n]}</span>);
-    } else {
-      text.push(<span style={{color: '#f00'}}><br />{count[n]}</span>);
+      text.push(<span style={{color: '#f00'}}>{separator}{count[n]}</span>);
     }
   }
   return (<td>{text}</td>);
@@ -204,7 +155,13 @@ function Puzzle(props) {
     <tr key={0}>
       <td></td>
       { Array.from(Array(10), (_, col) => (
-          <ColClue key={'cc' + col} col={col} puzzle={props.puzzle} guesses={props.guesses} />
+          <Clue
+            key={'cc' + col}
+            orientation='column'
+            index={col}
+            puzzle={props.puzzle}
+            guesses={props.guesses}
+          />
         ))
       }
     </tr>
@@ -212,7 +169,13 @@ function Puzzle(props) {
   for (let row = 0; row < 10; row++) {
     rows.push(
       <tr key={row + 1}>
-        <RowClue key={'cr' + row} row={row} puzzle={props.puzzle} guesses={props.guesses} />
+        <Clue
+          key={'cr' + row}
+          orientation='row'
+          index={row}
+          puzzle={props.puzzle}
+          guesses={props.guesses}
+        />
         { Array.from(Array(10), (_, col) => (
             <Square
               key={row + ',' + col}
