@@ -182,7 +182,7 @@ class Game extends React.Component {
     this.state = {
       autoFill: false,
     }
-    Object.assign(this.state, newPuzzle());
+    Object.assign(this.state, newPuzzle(this.state.autoFill));
   }
 
   onSquareClick = (event, row, col) => {
@@ -221,7 +221,7 @@ class Game extends React.Component {
 
   onNewGameClick = () => {
     console.log('New Game!');
-    this.setState(newPuzzle());
+    this.setState(newPuzzle(this.state.autoFill));
   }
 
   onAutoFillChange = () => {
@@ -264,10 +264,15 @@ function toIndex(row, col) {
   return row * 10 + col;
 }
 
-function newPuzzle() {
+function newPuzzle(autoFill) {
   let mistakes = 0;
   let puzzle = Array.from(Array(100), () => Math.random(1.0) < 0.5);
   let guesses = Array(100).fill(false);
+  if (autoFill) {
+    for (let i = 0; i < 10; i++) {
+      checkForFill(puzzle, guesses, i, i);
+    }
+  }
   return { mistakes, puzzle, guesses };
 };
 
