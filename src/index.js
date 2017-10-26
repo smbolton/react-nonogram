@@ -43,9 +43,6 @@ import './index.css';
 
 function RowClue(props) {
   // -FIX- this works, but it gives away information!
-  // !FIX! y - 1 => props.row
-  // x0 -> col0
-  // x -> col
   let row = props.row;
   let count = [];
   let known = [];
@@ -76,7 +73,7 @@ function RowClue(props) {
     }
   }
   let all = true;
-  for (let col = 1; col <= 10; col++) {
+  for (let col = 0; col < 10; col++) {
     if (props.puzzle[toIndex(row, col)] && !props.guesses[toIndex(row, col)]) {
       all = false;
     }
@@ -94,8 +91,54 @@ function RowClue(props) {
   return (<td>{text}</td>);
 }
 
-function Clue(props) {
-  return (<td>C{props.index}</td>);
+function ColClue(props) {
+  // -FIX- this works, but it gives away information!
+  let col = props.col;
+  let count = [];
+  let known = [];
+  let row0 = 0;
+  let t = props.puzzle[toIndex(0, col)];
+  let k = props.guesses[toIndex(0, col)];
+  for (let row = 1; row <= 10; row++) {
+    if (row === 10 || props.puzzle[toIndex(row, col)] !== t) {
+      if (t) {
+        count.push(row - row0);
+        if ((row === 10 || props.guesses[toIndex(row, col)]) && k) {
+          known.push(true);
+        } else {
+          known.push(false);
+        }
+      }
+      t = !t;
+      row0 = row;
+    }
+    if (row < 10) {
+      if (props.puzzle[toIndex(row, col)]) {
+        if (!props.guesses[toIndex(row, col)]) {
+          k = false;
+        }
+      } else {
+        k = props.guesses[toIndex(row, col)];
+      }
+    }
+  }
+  let all = true;
+  for (let row = 0; row < 10; row++) {
+    if (props.puzzle[toIndex(row, col)] && !props.guesses[toIndex(row, col)]) {
+      all = false;
+    }
+  }
+  let text = [];
+  for (let n = 0; n < count.length; n++) {
+    if (all) {
+      text.push(<span style={{color: '#000'}}><br />{count[n]}</span>);
+    } else if (known[n]) {
+      text.push(<span style={{color: '#00f'}}><br />{count[n]}</span>);
+    } else {
+      text.push(<span style={{color: '#f00'}}><br />{count[n]}</span>);
+    }
+  }
+  return (<td>{text}</td>);
 }
 
 function Square(props) {
@@ -160,7 +203,10 @@ function Puzzle(props) {
   let rows = [(
     <tr key={0}>
       <td></td>
-      { Array.from(Array(10), (_, col) => (<Clue key={'cc' + col} index={col} />)) }
+      { Array.from(Array(10), (_, col) => (
+          <ColClue key={'cc' + col} col={col} puzzle={props.puzzle} guesses={props.guesses} />
+        ))
+      }
     </tr>
   )];
   for (let row = 0; row < 10; row++) {
