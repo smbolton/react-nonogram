@@ -1,7 +1,10 @@
 {
   "name": "react-nonogram",
   "version": "0.1.0",
+  "description": "A nonogram puzzle game written in React",
+  "author": "Sean Bolton <sean@smbolton.com>",
   "private": true,
+  "license": "MIT",
   "dependencies": {
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
@@ -12,5 +15,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smbolton/react-nonogram.git"
+  },
+  "homepage": "."
 }

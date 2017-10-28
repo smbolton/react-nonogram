@@ -1,6 +1,11 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "React Nonogram",
+  "name": "React Nonogram Puzzle Game",
+  "author": "Sean Bolton",
+  "developer": {
+    "name": "Sean Bolton",
+      "url": "http://smbolton.com/"
+  },
   "icons": [
     {
       "src": "favicon.ico",
