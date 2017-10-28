@@ -1,39 +1,168 @@
+/* React Nonogram CSS – Copyright © 2017 Sean Bolton; MIT license. */
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: #333;
+  background-color: #fff;
+}
+
+a {
+  color: #3ac;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #258;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #258;
+}
+
+.container {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.header {
+  padding: 10px;
+  color: #fff;
+  background-color: #333;
+  border-radius: 5px;
+}
+
+.footer {
+  font-size: 90%;
+  color: #999;
+  text-align: center;
+  margin: 20px;
+}
+
+.footer a {
+  color: #77f;
+}
+
+/* ---------- layout ---------- */
+
+/* A flex container that horizontally centers the game board while allowing it
+ * to not occupy the container's full width. */
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Use a fixed-height button row, so .col children with 'vertical-align: middle'
+ * will center vertically. */
+.button_row {
+  height: 3rem;
+  line-height: 3.5rem;
+  text-align: center;
 }
 
 .col {
-    float: left;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
 }
 
-/*
-.puzzle-clue { width: 10%; }
-.puzzle-col  { width: 9%; }
-*/
+/* ---------- game board ---------- */
+
+.puzzle-border {
+  border: 2px solid #888;
+  border-radius: 5px;
+  background-color: #eee;
+  padding: 10px;
+}
+
+.puzzle {
+  background-color: #eee;
+  border-collapse: collapse;
+}
+
+td {
+  padding: 0;
+  border: none;
+}
+
+.clue-row {
+  text-align: right;
+  padding-right: 10px;
+}
+
+.clue-col {
+  text-align: center;
+  vertical-align: bottom;
+  padding-bottom: 5px;
+}
+
+.clue-done  { color: #000; }
+.clue-known { color: #00c; }
+.clue-new   { color: #c00; }
 
 .square {
   border: 1px solid #888;
   background: #fff;
-  height: 46px;
-  width: 46px;
-  padding: 0;
-  /* margin: -1px; */
+  border-top-left-radius: 8px;
 }
 
+.square-button {
+  height: 40px;
+  width: 40px;
+  border: none;
+  padding: 0;
+  background: #fff;
+}
+
+/* --------- game pieces ---------- */
+
 .coin {
-  stroke: #000;
+  stroke: #0000c1;
   stroke-width: 1px;
-  fill: #00f;
+  fill: #00dec1;
 }
 
 .space {
   stroke: none;
-  fill: #4c4c4c;
+  fill: #aaa;
 }
 
 .mistake {
   stroke: #f00;
-  stroke-width: 2.5px;
+  stroke-width: 1.2px;
+}
+
+/* ---------- bottom buttons ---------- */
+
+.button {
+  /* Bootstrap-ish button styling. */
+  color: #333;
+  background-color: #fff;
+  line-height: 1.42857;
+  border: 1px solid transparent;
+  border-color: #3b3bff;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #ddf;
+}
+
+.button:active {
+  color: #fff;
+  background-color: #55f;
+}
+
+input[type='checkbox'] {
+  cursor: pointer;
 }

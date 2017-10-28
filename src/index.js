@@ -42,15 +42,17 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 function Clue(props) {
-  let puzzle, guesses, separator;
+  let puzzle, guesses, separator, className;
   if (props.orientation === 'row') {
     puzzle = Array.from(Array(10), (_, col) => props.puzzle[toIndex(props.index, col)]);
     guesses = Array.from(Array(10), (_, col) => props.guesses[toIndex(props.index, col)]);
     separator = ' ';
+    className = 'clue-row';
   } else { // column
     puzzle = Array.from(Array(10), (_, row) => props.puzzle[toIndex(row, props.index)]);
     guesses = Array.from(Array(10), (_, row) => props.guesses[toIndex(row, props.index)]);
     separator = <br />;
+    className = 'clue-col';
   }
   // Build the clue string by scanning the row or column and identifying runs
   // of coins. For each run, push the count of coins to `count`. Also, if the
@@ -80,16 +82,18 @@ function Clue(props) {
   }
   // Build a array of clues as <span> elements, colored based on `all` and `known`.
   let text = [];
+  let sep = null;
   for (let n = 0; n < count.length; n++) {
     if (all) {
-      text.push(<span style={{color: '#000'}}>{separator}{count[n]}</span>);
+      text.push(<span className="clue-done">{sep}{count[n]}</span>);
     } else if (known[n]) {
-      text.push(<span style={{color: '#00f'}}>{separator}{count[n]}</span>);
+      text.push(<span className="clue-known">{sep}{count[n]}</span>);
     } else {
-      text.push(<span style={{color: '#f00'}}>{separator}{count[n]}</span>);
+      text.push(<span className="clue-new">{sep}{count[n]}</span>);
     }
+    sep = separator;
   }
-  return (<td>{text}</td>);
+  return (<td className={className}>{text}</td>);
 }
 
 function Square(props) {
@@ -97,17 +101,17 @@ function Square(props) {
   if (props.guess === 'o') {
     if (props.coin) {
       body = (
-        <svg width="36" height="36">
+        <svg width="34" height="34">
           <g>
-            <circle className="coin" cx="18" cy="18" r="14" />
+            <circle className="coin" cx="17" cy="17" r="12" />
           </g>
         </svg>
       );
     } else {
       body = (
-        <svg width="40" height="40">
+        <svg width="34" height="34">
           <g>
-            <circle className="space" cx="20" cy="20" r="8" />
+            <circle className="space" cx="17" cy="17" r="8" />
           </g>
         </svg>
       );
@@ -115,21 +119,21 @@ function Square(props) {
   } else if (props.guess === 'x') {
     if (props.coin) {
       body = (
-        <svg width="40" height="40">
+        <svg width="34" height="34">
           <g>
-            <circle className="coin" cx="20" cy="20" r="17" />
-            <path className="mistake" d="m 15 15 l 10 10" />
-            <path className="mistake" d="m 15 25 l 10 -10" />
+            <circle className="coin" cx="17" cy="17" r="12" />
+            <path className="mistake" d="m 13 13 l 8 8" />
+            <path className="mistake" d="m 13 21 l 8 -8" />
           </g>
         </svg>
       );
     } else {
       body = (
-        <svg width="40" height="40">
+        <svg width="34" height="34">
           <g>
-            <circle className="space" cx="20" cy="20" r="8" />
-            <path className="mistake" d="m 15 15 l 10 10" />
-            <path className="mistake" d="m 15 25 l 10 -10" />
+            <circle className="space" cx="17" cy="17" r="8" />
+            <path className="mistake" d="m 13 13 l 8 8" />
+            <path className="mistake" d="m 13 21 l 8 -8" />
           </g>
         </svg>
       );
@@ -138,9 +142,9 @@ function Square(props) {
     body = null; // props.coin ? '*' : '-';
   }
   return (
-    <td>
+    <td className="square">
       <button
-        className="square"
+        className="square-button"
         onClick={props.onClick}
         onContextMenu={props.onClick}
       >
@@ -189,45 +193,29 @@ function Puzzle(props) {
     );
   }
   return (
-    <div className="row">
-      <table>
-        {/*
-        <colgroup>
-          <col className="puzzle-clue" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-          <col className="puzzle-col" />
-        </colgroup>
-        */}
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
-    </div>
+    <table className="puzzle">
+      <tbody>
+        {rows}
+      </tbody>
+    </table>
   );
 }
 
 function Score(props) {
   return (
-    <p>Mistakes: {props.mistakes}</p>
+    <span>Mistakes: {props.mistakes}</span>
   );
 }
 
 function Undo(props) {
   return (
-    <button onClick={props.onClick}>Undo</button>
+    <button className="button" onClick={props.onClick}>Undo</button>
   );
 }
 
 function NewGame(props) {
   return (
-    <button onClick={props.onClick}>New Game</button>
+    <button className="button" onClick={props.onClick}>New Game</button>
   );
 }
 
@@ -319,26 +307,26 @@ class Game extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="row">
+      <div className="row">
+        <div className="puzzle-border">
           <Puzzle
             puzzle={this.state.puzzle}
             guesses={this.state.guesses}
             onSquareClick={this.onSquareClick}
           />
-        </div>
-        <div className="row">
-          <div className="col">
-            <Score mistakes={this.state.mistakes} />
-          </div>
-          <div className="col">
-            <Undo onClick={this.onUndoClick} />
-          </div>
-          <div className="col">
-            <NewGame onClick={this.onNewGameClick} />
-          </div>
-          <div className="col">
-            <AutoFill checked={this.state.autoFill} onChange={this.onAutoFillChange} />
+          <div className="button_row">
+            <div className="col">
+              <Score mistakes={this.state.mistakes} />
+            </div>
+            <div className="col">
+              <Undo onClick={this.onUndoClick} />
+            </div>
+            <div className="col">
+              <NewGame onClick={this.onNewGameClick} />
+            </div>
+            <div className="col">
+              <AutoFill checked={this.state.autoFill} onChange={this.onAutoFillChange} />
+            </div>
           </div>
         </div>
       </div>
