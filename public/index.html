@@ -11,13 +11,32 @@
   <body>
     <div class="container">
       <h3 class="header">React Nonogram</h3>
-      <p>Digits surrounding the grid show the number of consecutive coins in their respective
-        row or column. Left-click to mark a coin, middle- or right-click to mark a space.
+      <p>A <a href="https://en.wikipedia.org/wiki/Nonogram">nonogram</a> is a logic
+        puzzle consisting of a regular grid, where the objective is to determine
+        which of the grid cells is occupied through the use of clues for each row
+        and column. The clues describe contiguous runs of occupied cells, so that a
+        clue of “3 1 2” indicates a run of 3 contiguous occupied cells, followed by
+        some unknown number of empty spaces, one occupied cell, some number of spaces,
+        and finally two contiguous occupied cells.
+      </p>
+      <p>This nonogram app was written in <a href="https://reactjs.org/">React</a>
+        by <a href="http://smbolton.com/">Sean Bolton</a>. The official
+        <a href="https://reactjs.org/tutorial/tutorial.html">React Tutorial</a>
+        describes the making of a tic-tac-toe game, but nonograms are way more
+        interesting! You can find the
+        <a href="https://github.com/smbolton/react-nonogram/blob/master/LICENSE">
+        MIT-licensed</a> source code
+        <a href="https://github.com/smbolton/react-nonogram/">here</a>.
+      </p>
+      <p>Left-click to mark a occupied cell, right-click to mark a space.
       </p>
       <noscript>
         You need to enable JavaScript to run this app.
       </noscript>
       <div id="root"></div>
+      <div class="footer">
+        Copyright © 2017 Sean Bolton. Created with <a href="http://www.reactjs.org/">React</a>.
+      </div>
     </div>
   </body>
 </html>
