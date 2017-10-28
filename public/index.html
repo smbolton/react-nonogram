@@ -9,7 +9,13 @@
     <title>React Nonogram</title>
   </head>
   <body>
-    <div class="container">
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- Page content is hidden (replaced by a 'Loading...' message) until app
+         is ready, so as to avoid flash of unstyled content. -->
+    <div id="loading" style="text-align: center">Loading...</div>
+    <div id="content" style="display:none" class="container">
       <h3 class="header">React Nonogram</h3>
       <p>A <a href="https://en.wikipedia.org/wiki/Nonogram">nonogram</a> is a logic
         puzzle consisting of a regular grid, where the objective is to determine
@@ -30,9 +36,6 @@
       </p>
       <p>Left-click to mark a occupied cell, right-click to mark a space.
       </p>
-      <noscript>
-        You need to enable JavaScript to run this app.
-      </noscript>
       <div id="root"></div>
       <div class="footer">
         Copyright © 2017 Sean Bolton. Created with <a href="http://www.reactjs.org/">React</a>.

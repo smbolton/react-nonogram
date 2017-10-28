@@ -241,6 +241,11 @@ class Game extends React.Component {
     Object.assign(this.state, newPuzzle(this.state.autoFill));
   }
 
+  componentDidMount() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'inherit';
+  }
+
   onSquareClick = (event, row, col) => {
     console.log('Square!', event.type, row, col);
     //console.log(event.nativeEvent.which); // 1, 2 or 3 for left, middle, right click
