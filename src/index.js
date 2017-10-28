@@ -34,7 +34,7 @@
 // |  |            |                 | |
 // |  +------------+-----------------+ |
 // |                                   |
-// |   Score     NewGame     AutoFill  |
+// |  Score   Undo  NewGame  AutoFill  |
 // +-----------------------------------+
 
 import React from 'react';
@@ -219,6 +219,12 @@ function Score(props) {
   );
 }
 
+function Undo(props) {
+  return (
+    <button onClick={props.onClick}>Undo</button>
+  );
+}
+
 function NewGame(props) {
   return (
     <button onClick={props.onClick}>New Game</button>
@@ -255,11 +261,12 @@ class Game extends React.Component {
     if (!this.state.guesses[index]) {
       let guesses = this.state.guesses.slice();
       let mistakes = this.state.mistakes;
+      let thisMoveUndo = [index];
       if (event.type === 'click') {
         if (this.state.puzzle[index]) {
           guesses[index] = 'o'; // guess okay
           if (this.state.autoFill) {
-            checkForFill(this.state.puzzle, guesses, row, col);
+            checkForFill(this.state.puzzle, guesses, thisMoveUndo, row, col);
           }
         } else {
           guesses[index] = 'x'; // mistake
@@ -273,11 +280,30 @@ class Game extends React.Component {
           guesses[index] = 'x';
           mistakes++;
           if (this.state.autoFill) {
-            checkForFill(this.state.puzzle, guesses, row, col);
+            checkForFill(this.state.puzzle, guesses, thisMoveUndo, row, col);
           }
         }
       }
-      this.setState({ mistakes, guesses });
+      let undo = this.state.undo.slice();
+      undo.push(thisMoveUndo);
+      this.setState({ mistakes, guesses, undo });
+    }
+  }
+
+  onUndoClick = () => {
+    console.log('Undo!');
+    if (this.state.undo.length > 0) {
+      let mistakes = this.state.mistakes;
+      let guesses = this.state.guesses.slice();
+      let undo = this.state.undo.slice();
+      let thisMoveUndo = undo.pop();
+      for (let index of thisMoveUndo) {
+        if (guesses[index] === 'x') {
+          mistakes--;
+        }
+        guesses[index] = false;
+      }
+      this.setState({ mistakes, guesses, undo });
     }
   }
 
@@ -306,6 +332,9 @@ class Game extends React.Component {
             <Score mistakes={this.state.mistakes} />
           </div>
           <div className="col">
+            <Undo onClick={this.onUndoClick} />
+          </div>
+          <div className="col">
             <NewGame onClick={this.onNewGameClick} />
           </div>
           <div className="col">
@@ -330,15 +359,16 @@ function newPuzzle(autoFill) {
   let mistakes = 0;
   let puzzle = Array.from(Array(100), () => Math.random(1.0) < 0.5);
   let guesses = Array(100).fill(false);
+  let undo = [];
   if (autoFill) {
     for (let i = 0; i < 10; i++) {
-      checkForFill(puzzle, guesses, i, i);
+      checkForFill(puzzle, guesses, undo, i, i);
     }
   }
-  return { mistakes, puzzle, guesses };
+  return { mistakes, puzzle, guesses, undo };
 };
 
-function checkForFill(puzzle, guesses, row, col) {
+function checkForFill(puzzle, guesses, undo, row, col) {
   let all = true;
   for (let r = 0; r < 10; r++) {
     let index = toIndex(r, col);
@@ -350,8 +380,9 @@ function checkForFill(puzzle, guesses, row, col) {
   if (all) {
     for (let r = 0; r < 10; r++) {
       let index = toIndex(r, col);
-      if (!puzzle[index]) {
-        guesses[index] = guesses[index] || 'o';
+      if (!puzzle[index] && !guesses[index]) {
+        guesses[index] = 'o';
+        undo.push(index);
       }
     }
   }
@@ -366,8 +397,9 @@ function checkForFill(puzzle, guesses, row, col) {
   if (all) {
     for (let c = 0; c < 10; c++) {
       let index = toIndex(row, c);
-      if (!puzzle[index]) {
-        guesses[index] = guesses[index] || 'o';
+      if (!puzzle[index] && !guesses[index]) {
+        guesses[index] = 'o';
+        undo.push(index);
       }
     }
   }
