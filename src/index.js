@@ -1,54 +1,76 @@
-/* React Nonogram, by Sean Bolton
- *
- * A puzzle game in the vein of Griddlers, Picross, Picma, or Fugazo World Mosaics.
- * See https://en.wikipedia.org/wiki/Nonogram
- *
- * Copyright © 2017 Sean Bolton.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// React Nonogram, by Sean Bolton
+//
+// A puzzle game in the vein of Griddlers, Picross, Picma, or Fugazo World
+// Mosaics. See https://en.wikipedia.org/wiki/Nonogram
+//
+// Copyright © 2017 Sean Bolton.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// Game--------------------------------+
-// |  Puzzle-------+-----------------+ |
-// |  |            |     10x Clue    | |
-// |  +------------+-----------------+ |
-// |  |            |                 | |
-// |  |  10x Clue  |  10x10: Square  | |
-// |  |            |                 | |
-// |  +------------+-----------------+ |
-// |                                   |
-// |  Score   Undo  NewGame  AutoFill  |
-// +-----------------------------------+
+// Component hierarchy and rough wireframe:
+//
+//   Game--------------------------------+
+//   |  Puzzle-------+-----------------+ |
+//   |  |            |     10x Clue    | |
+//   |  +------------+-----------------+ |
+//   |  |            |                 | |
+//   |  |  10x Clue  |  10x10: Square  | |
+//   |  |            |                 | |
+//   |  +------------+-----------------+ |
+//   |                                   |
+//   |  Score   Undo  NewGame  AutoFill  |
+//   +-----------------------------------+
+//
+// All state is contained by the `Game` component, and consists of the following
+// items:
+//
+//    autoFill -- true if the game logic should automatically mark all spaces in
+//                a row or column once all occupied squares have been guessed.
+//    mistakes -- integer, count of the number of incorrect guesses the user has
+//                made, initially 0.
+//    puzzle -- Array of 100 booleans, in row-major order, values are true for
+//                occupied squares.
+//    guesses -- Array of 100 tri-state values:
+//                  false: no guess has been made,
+//                  'o': a correct guess was made,
+//                  'x': an incorrect guess was made.
+//                Initially all false.
+//    undo -- an Array of Arrays, each sub-array contains the indices (into
+//                `puzzle` and 'guesses') of the squares that changed for that
+//                respective move. (When `autoFill` is true, multiple squares
+//                can change per move.) Initially an empty Array.
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+/* ---------- Subcomponents ---------- */
+
 function Clue(props) {
   let puzzle, guesses, separator, className;
-  if (props.orientation === 'row') {
+  if (props.orientation === 'row') { // a row clue
     puzzle = Array.from(Array(10), (_, col) => props.puzzle[toIndex(props.index, col)]);
     guesses = Array.from(Array(10), (_, col) => props.guesses[toIndex(props.index, col)]);
     separator = ' ';
     className = 'clue-row';
-  } else { // column
+  } else { // a column clue
     puzzle = Array.from(Array(10), (_, row) => props.puzzle[toIndex(row, props.index)]);
     guesses = Array.from(Array(10), (_, row) => props.guesses[toIndex(row, props.index)]);
     separator = <br />;
@@ -80,7 +102,8 @@ function Clue(props) {
       all = false;
     }
   }
-  // Build a array of clues as <span> elements, colored based on `all` and `known`.
+  // Build an array of clues as <span> elements, colored based on `all` and
+  // `known`.
   let text = [];
   let sep = null;
   for (let n = 0; n < count.length; n++) {
@@ -97,6 +120,8 @@ function Clue(props) {
 }
 
 function Square(props) {
+  // Each square is a button, containing the appropriate SVG image if a guess
+  // has been made for it.
   let body;
   if (props.guess === 'o') {
     if (props.coin) {
@@ -139,7 +164,7 @@ function Square(props) {
       );
     }
   } else {
-    body = null; // props.coin ? '*' : '-';
+    body = null;
   }
   return (
     <td className="square">
@@ -155,6 +180,8 @@ function Square(props) {
 }
 
 function Puzzle(props) {
+  // Build the puzzle <table> as an array of <tr> rows.
+  // -- first, the column clues
   let rows = [(
     <tr key={0}>
       <td></td>
@@ -170,6 +197,7 @@ function Puzzle(props) {
       }
     </tr>
   )];
+  // -- next, for each row: the row clue and 10 squares
   for (let row = 0; row < 10; row++) {
     rows.push(
       <tr key={row + 1}>
@@ -192,6 +220,7 @@ function Puzzle(props) {
       </tr>
     );
   }
+  // -- wrap it in the table
   return (
     <table className="puzzle">
       <tbody>
@@ -231,6 +260,8 @@ function AutoFill(props) {
   );
 }
 
+/* ---------- Main Component ---------- */
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -242,6 +273,7 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
+    // Hide the 'Loading...' text and display the app.
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'inherit';
   }
@@ -256,16 +288,19 @@ class Game extends React.Component {
       let mistakes = this.state.mistakes;
       let thisMoveUndo = [index];
       if (event.type === 'click') {
+        // left click: user guessed square is occupied
         if (this.state.puzzle[index]) {
           guesses[index] = 'o'; // guess okay
           if (this.state.autoFill) {
+            // checkForFill modifies `guesses` and `thisMoveUndo`
             checkForFill(this.state.puzzle, guesses, thisMoveUndo, row, col);
           }
         } else {
           guesses[index] = 'x'; // mistake
           mistakes++;
         }
-      } else { /* contextmenu */
+      } else {
+        // contextmenu: user guessed square is empty
         event.preventDefault();
         if (!this.state.puzzle[index]) {
           guesses[index] = 'o';
@@ -273,6 +308,7 @@ class Game extends React.Component {
           guesses[index] = 'x';
           mistakes++;
           if (this.state.autoFill) {
+            // checkForFill modifies `guesses` and `thisMoveUndo`
             checkForFill(this.state.puzzle, guesses, thisMoveUndo, row, col);
           }
         }
@@ -286,6 +322,8 @@ class Game extends React.Component {
   onUndoClick = () => {
     console.log('Undo!');
     if (this.state.undo.length > 0) {
+      // Remove the array of changes from the last move from the undo stack, and
+      // set each square in it to be un-guessed.
       let mistakes = this.state.mistakes;
       let guesses = this.state.guesses.slice();
       let undo = this.state.undo.slice();
@@ -344,6 +382,8 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+/* ---------- Game Logic ---------- */
+
 function toIndex(row, col) {
   return row * 10 + col;
 }
@@ -362,6 +402,9 @@ function newPuzzle(autoFill) {
 };
 
 function checkForFill(puzzle, guesses, undo, row, col) {
+  // For the given row and column, check if all occupied squares have been
+  // guessed. If so, auto-fill any spaces in them with correct guesses.
+  // * This modifies `guesses` and `undo`. *
   let all = true;
   for (let r = 0; r < 10; r++) {
     let index = toIndex(r, col);
