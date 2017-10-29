@@ -19,6 +19,8 @@ the official `React Tutorial`_ tic-tac-toe app, but more interesting.
 .. _play: http://smbolton.com/nonogram/index.html
 
 .. image:: screenshot.png
+   :alt: React Nonogram Screenshot
+   :target: http://smbolton.com/nonogram/index.html
 
 Installation
 ============
