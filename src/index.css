@@ -37,10 +37,11 @@ a:visited {
   border-radius: 5px;
 }
 
-.github-icon {
+.header-icon {
   color: #fff;
   float: right;
   font-size: 1.2em;
+  padding-left: 0.3em;
   padding-right: 0.3em;
 }
 
