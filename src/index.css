@@ -37,6 +37,13 @@ a:visited {
   border-radius: 5px;
 }
 
+.github-icon {
+  color: #fff;
+  float: right;
+  font-size: 1.2em;
+  padding-right: 0.3em;
+}
+
 .footer {
   font-size: 90%;
   color: #999;
